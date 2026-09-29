@@ -77,10 +77,10 @@ class ModelInfo(BaseModel):
     is_available: bool = True
 
 class AppSettingsSchema(BaseModel):
-    muapi_api_key: str = Field(default="", json_schema_extra={"writeOnly": True})
-    muapi_base_url: str = "https://api.muapi.ai/api/v1"
+    model_api_key: str = Field(default="", json_schema_extra={"writeOnly": True})
+    model_api_base_url: str = ""
     composio_api_key: str = Field(default="", json_schema_extra={"writeOnly": True})
-    muapi_api_key_configured: bool = False
+    model_api_key_configured: bool = False
     composio_api_key_configured: bool = False
     default_model: str = "gpt-5-mini"
     theme: str = "dark"

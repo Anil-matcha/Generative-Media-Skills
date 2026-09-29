@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 class Settings:
-    MUAPI_API_KEY: str = os.getenv("MUAPI_API_KEY", "")
-    MUAPI_BASE_URL: str = os.getenv("MUAPI_BASE_URL", "https://api.muapi.ai/api/v1").rstrip("/")
+    MODEL_API_KEY: str = os.getenv("MODEL_API_KEY", "")
+    MODEL_API_BASE_URL: str = os.getenv("MODEL_API_BASE_URL", "").rstrip("/")
     COMPOSIO_API_KEY: str = os.getenv("COMPOSIO_API_KEY", "")
     DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "gpt-5-mini")
     DATA_DIR: Path = Path(

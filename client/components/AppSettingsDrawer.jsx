@@ -15,13 +15,13 @@ export default function AppSettingsDrawer({
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
 
-  // MUAPI Connection Credentials
-  const [muapiApiKey, setMuapiApiKey] = useState("");
-  const [muapiBaseUrl, setMuapiBaseUrl] = useState(
-    "https://api.muapi.ai/api/v1",
+  // Inference API credentials
+  const [providerApiKey, setModelProviderApiKey] = useState("");
+  const [providerBaseUrl, setModelProviderBaseUrl] = useState(
+    "",
   );
   const [composioApiKey, setComposioApiKey] = useState("");
-  const [muapiConfigured, setMuapiConfigured] = useState(false);
+  const [providerConfigured, setModelProviderConfigured] = useState(false);
   const [composioConfigured, setComposioConfigured] = useState(false);
   const [defaultModel, setDefaultModel] = useState("gpt-5-mini");
   const [showApiKey, setShowApiKey] = useState(false);
@@ -41,14 +41,14 @@ export default function AppSettingsDrawer({
       setUserName(localName);
       setUserEmail(localEmail);
 
-      // Load MUAPI settings from backend
+      // Load inference API settings from backend
       fetchSettings()
         .then((data) => {
           if (data) {
-            setMuapiApiKey(data.muapi_api_key || "");
-            setMuapiConfigured(Boolean(data.muapi_api_key_configured));
-            setMuapiBaseUrl(
-              data.muapi_base_url || "https://api.muapi.ai/api/v1",
+            setModelProviderApiKey(data.model_api_key || "");
+            setModelProviderConfigured(Boolean(data.model_api_key_configured));
+            setModelProviderBaseUrl(
+              data.model_api_base_url || "",
             );
             setComposioApiKey(data.composio_api_key || "");
             setComposioConfigured(Boolean(data.composio_api_key_configured));
@@ -91,18 +91,18 @@ export default function AppSettingsDrawer({
     setTimeout(() => setSavedField(null), 1500);
   };
 
-  const handleSaveMuapiSettings = async (field = "muapi") => {
+  const handleSaveModelProviderSettings = async (field = "provider") => {
     try {
       const saved = await saveSettings({
-        muapi_api_key: muapiApiKey,
-        muapi_base_url: muapiBaseUrl,
+        model_api_key: providerApiKey,
+        model_api_base_url: providerBaseUrl,
         composio_api_key: composioApiKey,
         default_model: defaultModel,
         theme: "dark",
       });
-      setMuapiApiKey("");
+      setModelProviderApiKey("");
       setComposioApiKey("");
-      setMuapiConfigured(Boolean(saved?.muapi_api_key_configured));
+      setModelProviderConfigured(Boolean(saved?.model_api_key_configured));
       setComposioConfigured(Boolean(saved?.composio_api_key_configured));
       if (onUpdateDefaultModel && typeof onUpdateDefaultModel === "function") {
         onUpdateDefaultModel(defaultModel);
@@ -178,22 +178,22 @@ export default function AppSettingsDrawer({
             </p>
           </div>
 
-          {/* MUAPI API Key */}
+          {/* Inference API Key */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-              <span className="text-amber-400">•</span> MUAPI API Key
+              <span className="text-amber-400">•</span> Inference API Key
             </label>
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
                 <input
                   suppressHydrationWarning={true}
                   type={showApiKey ? "text" : "password"}
-                  value={muapiApiKey}
-                  onChange={(e) => setMuapiApiKey(e.target.value)}
+                  value={providerApiKey}
+                  onChange={(e) => setModelProviderApiKey(e.target.value)}
                   placeholder={
-                    muapiConfigured
+                    providerConfigured
                       ? "Stored securely — enter to replace"
-                      : "Paste MUAPI API Key..."
+                      : "Enter inference API key..."
                   }
                   className="w-full bg-[#222226] border border-[#2e2e34] rounded-xl pl-3.5 pr-8 py-2.5 text-xs text-zinc-200 font-mono placeholder-zinc-500 focus:outline-none focus:border-zinc-400 transition"
                 />
@@ -209,17 +209,17 @@ export default function AppSettingsDrawer({
               <button
                 suppressHydrationWarning={true}
                 type="button"
-                onClick={() => handleSaveMuapiSettings("muapi_key")}
+                onClick={() => handleSaveModelProviderSettings("provider_key")}
                 className="px-3.5 py-2.5 rounded-xl border border-[#33333a] bg-[#222226] hover:bg-[#2c2c34] text-xs font-medium text-zinc-300 hover:text-white transition flex items-center gap-1 flex-shrink-0"
               >
                 <FiCheck
                   className={
-                    savedField === "muapi_key"
+                    savedField === "provider_key"
                       ? "text-emerald-400"
                       : "text-zinc-400"
                   }
                 />
-                <span>{savedField === "muapi_key" ? "Saved" : "Save"}</span>
+                <span>{savedField === "provider_key" ? "Saved" : "Save"}</span>
               </button>
             </div>
           </div>
@@ -256,7 +256,7 @@ export default function AppSettingsDrawer({
               <button
                 suppressHydrationWarning={true}
                 type="button"
-                onClick={() => handleSaveMuapiSettings("composio_key")}
+                onClick={() => handleSaveModelProviderSettings("composio_key")}
                 className="px-3.5 py-2.5 rounded-xl border border-[#33333a] bg-[#222226] hover:bg-[#2c2c34] text-xs font-medium text-zinc-300 hover:text-white transition flex items-center gap-1 flex-shrink-0"
               >
                 <FiCheck
@@ -449,17 +449,17 @@ export default function AppSettingsDrawer({
               <button
                 suppressHydrationWarning={true}
                 type="button"
-                onClick={() => handleSaveMuapiSettings("muapi_model")}
+                onClick={() => handleSaveModelProviderSettings("provider_model")}
                 className="px-3.5 py-2.5 rounded-xl border border-[#33333a] bg-[#222226] hover:bg-[#2c2c34] text-xs font-medium text-zinc-300 hover:text-white transition flex items-center gap-1 flex-shrink-0"
               >
                 <FiCheck
                   className={
-                    savedField === "muapi_model"
+                    savedField === "provider_model"
                       ? "text-emerald-400"
                       : "text-zinc-400"
                   }
                 />
-                <span>{savedField === "muapi_model" ? "Saved" : "Save"}</span>
+                <span>{savedField === "provider_model" ? "Saved" : "Save"}</span>
               </button>
             </div>
           </div>

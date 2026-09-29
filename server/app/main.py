@@ -8,7 +8,7 @@ from app.services.auth_service import auth_service
 
 app = FastAPI(
     title="Open Dots API",
-    description="Self-hosted Open Dots API with a MUAPI model adapter",
+    description="Open-source alternative to OpenAI Dots: self-hosted AI workspace API with a configurable inference adapter",
     version="1.0.0"
 )
 
@@ -67,7 +67,7 @@ async def health_check():
     return {
         "status": "online",
         "service": "Open Dots FastAPI Backend",
-        "provider": "MUAPI API Endpoints",
+        "provider": "configured inference endpoint",
         "computer_provider": settings.COMPUTER_PROVIDER,
         "default_model": "gpt-5-mini"
     }

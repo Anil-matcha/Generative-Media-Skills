@@ -34,21 +34,21 @@ class StorageServiceTests(unittest.TestCase):
             {"request_id": "request-test", "thread_id": "thread-test", "status": "pending"}
         )
         self.service.add_audit_event({"event": "test.completed", "request_id": "request-test"})
-        self.service.save_settings({"muapi_api_key": "super-secret", "theme": "light"})
+        self.service.save_settings({"model_api_key": "super-secret", "theme": "light"})
 
-        self.service.save_settings({"muapi_api_key": "", "theme": "dark"})
+        self.service.save_settings({"model_api_key": "", "theme": "dark"})
         reopened = StorageService(self.root)
 
         self.assertEqual(reopened.get_bots(), [{"id": "bot-test", "name": "Persistent bot"}])
         self.assertEqual(reopened.get_messages("thread-test")[0]["text"], "remember this")
         self.assertEqual(reopened.get_approvals("thread-test")[0]["request_id"], "request-test")
         self.assertEqual(reopened.get_audit_events(10)[-1]["event"], "test.completed")
-        self.assertEqual(reopened.get_settings()["muapi_api_key"], "super-secret")
+        self.assertEqual(reopened.get_settings()["model_api_key"], "super-secret")
         self.assertEqual(reopened.get_settings()["theme"], "dark")
 
         public = reopened.get_public_settings()
-        self.assertEqual(public["muapi_api_key"], "")
-        self.assertTrue(public["muapi_api_key_configured"])
+        self.assertEqual(public["model_api_key"], "")
+        self.assertTrue(public["model_api_key_configured"])
         self.assertNotIn(b"super-secret", self._database_bytes())
 
         with sqlite3.connect(reopened.db_path) as connection:
@@ -86,8 +86,8 @@ class StorageServiceTests(unittest.TestCase):
             legacy_root,
             "settings.json",
             {
-                "muapi_api_key": legacy_secret,
-                "muapi_base_url": "https://example.test/api/v1",
+                "model_api_key": legacy_secret,
+                "model_api_base_url": "https://example.test/api/v1",
                 "theme": "light",
             },
         )
@@ -106,39 +106,39 @@ class StorageServiceTests(unittest.TestCase):
 
         self.assertEqual(imported.get_bots()[0]["id"], "legacy-bot")
         self.assertEqual(imported.get_messages("legacy-thread")[0]["text"], "Imported message")
-        self.assertEqual(imported.get_settings()["muapi_api_key"], legacy_secret)
-        self.assertTrue(imported.get_public_settings()["muapi_api_key_configured"])
+        self.assertEqual(imported.get_settings()["model_api_key"], legacy_secret)
+        self.assertTrue(imported.get_public_settings()["model_api_key_configured"])
         self.assertEqual(imported.get_approvals()[0]["request_id"], "legacy-request")
         self.assertEqual(imported.get_audit_events()[0]["event"], "legacy.imported")
 
         scrubbed = (legacy_root / "settings.json").read_text(encoding="utf-8")
         self.assertNotIn(legacy_secret, scrubbed)
-        self.assertIn('"muapi_api_key": ""', scrubbed)
+        self.assertIn('"model_api_key": ""', scrubbed)
         self.assertEqual((legacy_root / ".encryption.key").stat().st_mode & 0o777, 0o600)
 
         reopened = StorageService(legacy_root)
-        self.assertEqual(reopened.get_settings()["muapi_api_key"], legacy_secret)
+        self.assertEqual(reopened.get_settings()["model_api_key"], legacy_secret)
 
     def test_settings_routes_never_return_provider_credentials(self):
-        self.service.save_settings({"muapi_api_key": "route-secret"})
+        self.service.save_settings({"model_api_key": "route-secret"})
         original_storage = settings_router.storage_service
         settings_router.storage_service = self.service
         try:
             fetched = asyncio.run(settings_router.get_settings())
-            self.assertEqual(fetched.muapi_api_key, "")
-            self.assertTrue(fetched.muapi_api_key_configured)
+            self.assertEqual(fetched.model_api_key, "")
+            self.assertTrue(fetched.model_api_key_configured)
 
             saved = asyncio.run(
                 settings_router.save_settings(
                     AppSettingsSchema(
-                        muapi_api_key="",
-                        muapi_base_url="https://example.test/api/v1",
+                        model_api_key="",
+                        model_api_base_url="https://example.test/api/v1",
                     )
                 )
             )
-            self.assertEqual(saved.muapi_api_key, "")
-            self.assertTrue(saved.muapi_api_key_configured)
-            self.assertEqual(self.service.get_settings()["muapi_api_key"], "route-secret")
+            self.assertEqual(saved.model_api_key, "")
+            self.assertTrue(saved.model_api_key_configured)
+            self.assertEqual(self.service.get_settings()["model_api_key"], "route-secret")
         finally:
             settings_router.storage_service = original_storage
 

@@ -86,7 +86,7 @@ export default function Dashboard() {
         name,
         role: role || 'AI Assistant',
         model: model || 'gpt-5-mini',
-        description: `Custom agent running model ${model || 'gpt-5-mini'} via MUAPI.`,
+        description: `Custom assistant configured to use ${model || 'gpt-5-mini'}.`,
         avatar: '🤖',
         system_prompt: `You are ${name}, a helpful AI assistant.`
       });

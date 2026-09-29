@@ -17,7 +17,7 @@ import { fetchSettings, saveSettings } from '../lib/api';
 
 export default function SettingsModal({ isOpen, onClose }) {
   const [apiKey, setApiKey] = useState('');
-  const [baseUrl, setBaseUrl] = useState('https://api.muapi.ai/api/v1');
+  const [baseUrl, setBaseUrl] = useState('');
   const [defaultModel, setDefaultModel] = useState('gpt-5-mini');
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
   const [showKey, setShowKey] = useState(false);
@@ -28,9 +28,9 @@ export default function SettingsModal({ isOpen, onClose }) {
       fetchSettings()
         .then((data) => {
           if (data) {
-            setApiKey(data.muapi_api_key || '');
-            setApiKeyConfigured(Boolean(data.muapi_api_key_configured));
-            setBaseUrl(data.muapi_base_url || 'https://api.muapi.ai/api/v1');
+            setApiKey(data.model_api_key || '');
+            setApiKeyConfigured(Boolean(data.model_api_key_configured));
+            setBaseUrl(data.model_api_base_url || '');
             setDefaultModel(data.default_model || 'gpt-5-mini');
           }
         })
@@ -44,13 +44,13 @@ export default function SettingsModal({ isOpen, onClose }) {
     e.preventDefault();
     try {
       const saved = await saveSettings({
-        muapi_api_key: apiKey,
-        muapi_base_url: baseUrl,
+        model_api_key: apiKey,
+        model_api_base_url: baseUrl,
         default_model: defaultModel,
         theme: 'dark'
       });
       setApiKey('');
-      setApiKeyConfigured(Boolean(saved?.muapi_api_key_configured));
+      setApiKeyConfigured(Boolean(saved?.model_api_key_configured));
       setSavedSuccess(true);
       setTimeout(() => {
         setSavedSuccess(false);
@@ -72,7 +72,7 @@ export default function SettingsModal({ isOpen, onClose }) {
             </div>
             <div>
               <h2 className="text-xs font-bold text-zinc-100 tracking-wide">App Settings & API Credentials</h2>
-              <p className="text-[11px] text-zinc-400 mt-0.5">Configure MUAPI keys & default model settings</p>
+              <p className="text-[11px] text-zinc-400 mt-0.5">Configure inference access and the default model</p>
             </div>
           </div>
 
@@ -86,10 +86,10 @@ export default function SettingsModal({ isOpen, onClose }) {
         </div>
 
         <form onSubmit={handleSave} className="space-y-4">
-          {/* MUAPI API Key Field */}
+          {/* Inference API Key Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-              <FiLock className="text-amber-400 text-xs" /> MUAPI API Key
+              <FiLock className="text-amber-400 text-xs" /> Inference API Key
             </label>
             <div className="relative">
               <input
@@ -97,7 +97,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                 type={showKey ? 'text' : 'password'}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder={apiKeyConfigured ? 'Stored securely — enter to replace' : 'Paste MUAPI API Key...'}
+                placeholder={apiKeyConfigured ? 'Stored securely — enter to replace' : 'Enter inference API key...'}
                 className="w-full rounded-full bg-[#1c202d] border border-[#2a3045] px-4 py-2 pr-10 text-xs text-zinc-100 placeholder-zinc-500 font-mono focus:outline-none focus:border-blue-500 transition"
               />
               <button
@@ -114,17 +114,17 @@ export default function SettingsModal({ isOpen, onClose }) {
             </p>
           </div>
 
-          {/* MUAPI Base Endpoint URL Field */}
+          {/* Inference API Base URL Field */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-              <FiGlobe className="text-blue-400 text-xs" /> MUAPI Base Endpoint URL
+              <FiGlobe className="text-blue-400 text-xs" /> Inference API Base URL
             </label>
             <input
               suppressHydrationWarning={true}
               type="text"
               value={baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="https://api.muapi.ai/api/v1"
+              placeholder="https://your-inference-host.example/api/v1"
               className="w-full rounded-full bg-[#1c202d] border border-[#2a3045] px-4 py-2 text-xs text-cyan-300 font-mono focus:outline-none focus:border-blue-500 transition"
             />
           </div>

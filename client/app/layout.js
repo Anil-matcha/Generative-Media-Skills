@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Open Dots — Self-Hosted AI Workspace',
-  description: 'A self-hosted AI workspace for chat, tools, and governed computer tasks.',
+  title: 'Open Dots — Open-Source Alternative to OpenAI Dots',
+  description: 'Open-source alternative to OpenAI Dots: a self-hosted AI workspace for chat, tools, approvals, connectors, and computer tasks.',
 };
 
 export default function RootLayout({ children }) {

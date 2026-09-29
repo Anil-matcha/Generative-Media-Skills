@@ -53,7 +53,7 @@ export default function ChatWindow({ bot, models, messages, setMessages, onUpdat
     {
       id: 'msg-intro',
       sender: 'bot',
-      text: `Hello! I am **${botTitle}**, running via MUAPI endpoints. Ask me anything, or give me a task to analyze!`,
+      text: `Hello! I am **${botTitle}**. Ask me anything, or give me a task to work on!`,
       isError: false,
     },
   ];
@@ -121,7 +121,7 @@ export default function ChatWindow({ bot, models, messages, setMessages, onUpdat
 
     let finalImageUrl = currentSelected?.uploadedUrl || null;
 
-    // Ensure image upload finishes before dispatching to backend/MUAPI
+    // Ensure image upload finishes before dispatching to the inference backend
     if (currentSelected && !finalImageUrl) {
       try {
         const res = await uploadImage(currentSelected.file);

@@ -16,7 +16,7 @@ ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"}
 async def upload_image_file(file: UploadFile = File(...)):
     """
     Direct file upload endpoint for images.
-    Strictly validates image MIME types and dispatches to MUAPI /upload_file endpoint.
+    Validates image MIME types and optionally uploads to the configured /upload_file endpoint.
     """
     content_type = file.content_type or ""
     filename = file.filename or ""
@@ -34,10 +34,10 @@ async def upload_image_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Uploaded image file is empty.")
 
     app_settings = storage_service.get_settings()
-    api_key = app_settings.get("muapi_api_key") or settings.MUAPI_API_KEY
-    base_url = (app_settings.get("muapi_base_url") or settings.MUAPI_BASE_URL).rstrip("/")
+    api_key = app_settings.get("model_api_key") or settings.MODEL_API_KEY
+    base_url = (app_settings.get("model_api_base_url") or settings.MODEL_API_BASE_URL).rstrip("/")
 
-    # If valid MUAPI API Key is available, dispatch to MUAPI direct upload_file endpoint
+    # Use the configured endpoint for hosted images when credentials are available.
     if api_key and not api_key.startswith("mock_"):
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
@@ -51,7 +51,7 @@ async def upload_image_file(file: UploadFile = File(...)):
                     if hosted_url:
                         return {"url": hosted_url, "filename": filename}
         except Exception as err:
-            print(f"MUAPI upload_file dispatch notice: {err}")
+            print(f"Hosted image upload failed; using a local data URL: {err}")
 
     # Fallback base64 data URL for local offline image previews
     b64_str = base64.b64encode(file_bytes).decode("utf-8")

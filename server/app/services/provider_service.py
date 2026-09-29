@@ -5,7 +5,7 @@ from typing import AsyncGenerator, Dict, Any, List
 from app.config import settings
 from app.services.storage_service import storage_service
 
-class MuapiService:
+class ModelProviderService:
     def __init__(self):
         pass
 
@@ -16,17 +16,25 @@ class MuapiService:
         system_prompt: str = ""
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """
-        Stream chat completions from MUAPI API endpoint.
+        Submit chat requests to the configured inference endpoint.
         Uses exact user-selected model slug without any model remapping or fallback.
         """
         app_settings = storage_service.get_settings()
-        api_key = app_settings.get("muapi_api_key") or settings.MUAPI_API_KEY
-        base_url = (app_settings.get("muapi_base_url") or settings.MUAPI_BASE_URL).rstrip("/")
+        api_key = app_settings.get("model_api_key") or settings.MODEL_API_KEY
+        base_url = (app_settings.get("model_api_base_url") or settings.MODEL_API_BASE_URL).rstrip("/")
 
         if not api_key:
             yield {
                 "type": "content.delta",
-                "delta": "Error: MUAPI API Key is missing. Please configure your key in App Settings & API Credentials."
+                "delta": "An inference API key is missing. Add one in App Settings → Connections."
+            }
+            yield {"type": "turn.completed", "ok": False}
+            return
+
+        if not base_url:
+            yield {
+                "type": "content.delta",
+                "delta": "An inference API base URL is missing. Add it in App Settings → Connections."
             }
             yield {"type": "turn.completed", "ok": False}
             return
@@ -45,7 +53,7 @@ class MuapiService:
                     image_url = m.get("image_url")
                 break
 
-        # Format last 10 previous conversation messages into system_prompt so MUAPI maintains memory
+        # Include recent conversation context in the system prompt for stateless inference endpoints.
         previous_messages = messages[:-1] if len(messages) > 1 else []
         last_10_messages = previous_messages[-10:] if len(previous_messages) > 10 else previous_messages
 
@@ -69,13 +77,13 @@ class MuapiService:
             else:
                 full_system_prompt = context_prefix
 
-        # Standard MUAPI headers matching muapiapp protocol
+        # Headers expected by the configured inference endpoint.
         headers = {
             "Content-Type": "application/json",
             "x-api-key": api_key,
         }
 
-        # Format input payload matching MUAPI's exact image_url input schema
+        # Request body expected by the configured inference endpoint.
         input_body = {
             "prompt": user_prompt,
             "image_url": image_url if image_url else None,
@@ -182,19 +190,18 @@ class MuapiService:
                                 return
 
                         else:
-                            last_error = f"MUAPI Endpoint ({endpoint_url}) returned HTTP {response.status_code}: {response.text}"
+                            last_error = f"Inference endpoint ({endpoint_url}) returned HTTP {response.status_code}: {response.text}"
                     except Exception as exc:
                         last_error = f"Connection error on ({endpoint_url}): {str(exc)}"
 
         except Exception as exc:
-            last_error = f"MUAPI Client Error: {str(exc)}"
+            last_error = f"Inference request failed: {str(exc)}"
 
         # Output exact backend error message to frontend UI without any fallback mockup
-        error_display = last_error if last_error else "Error: Unable to connect to MUAPI service."
+        error_display = last_error if last_error else "Unable to connect to the inference endpoint."
         yield {"type": "content.delta", "delta": error_display}
         yield {"type": "turn.completed", "ok": False}
 
-muapi_service = MuapiService()
-
+provider_service = ModelProviderService()
 
 

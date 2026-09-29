@@ -13,10 +13,10 @@ from app.services.database import Database
 from app.services.secret_store import SecretStore, SecretStoreError
 
 
-SECRET_KEYS = {"muapi_api_key", "composio_api_key", "composio_key"}
+SECRET_KEYS = {"model_api_key", "composio_api_key", "composio_key"}
 SETTING_KEYS = {
-    "muapi_api_key",
-    "muapi_base_url",
+    "model_api_key",
+    "model_api_base_url",
     "composio_api_key",
     "composio_key",
     "default_model",
@@ -53,8 +53,8 @@ class StorageService:
     @staticmethod
     def _default_settings() -> Dict[str, Any]:
         return {
-            "muapi_api_key": settings.MUAPI_API_KEY,
-            "muapi_base_url": settings.MUAPI_BASE_URL,
+            "model_api_key": settings.MODEL_API_KEY,
+            "model_api_base_url": settings.MODEL_API_BASE_URL,
             "composio_api_key": settings.COMPOSIO_API_KEY,
             "default_model": settings.DEFAULT_MODEL,
             "theme": "dark",

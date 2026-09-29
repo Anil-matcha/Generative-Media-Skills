@@ -1,6 +1,7 @@
 {
   "name": "open-dots-frontend",
   "version": "0.1.0",
+  "description": "Open-source alternative to OpenAI Dots: a self-hosted AI workspace.",
   "private": true,
   "scripts": {
     "dev": "next dev",

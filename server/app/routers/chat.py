@@ -8,7 +8,7 @@ from typing import List, Optional
 
 from app.schemas.contracts import TurnRequest, Message
 from app.services.storage_service import storage_service
-from app.services.muapi_service import muapi_service
+from app.services.provider_service import provider_service
 from app.services.action_gateway import (
     ActionGatewayError,
     ActionPolicyError,
@@ -204,9 +204,9 @@ async def stream_turn(thread_id: str, model: Optional[str] = Query("gpt-5-mini")
         if tool_context:
             system_prompt = f"{system_prompt}\n\n{tool_context}"
 
-        # Stream content from MUAPI service
+        # Stream content from inference adapter
         try:
-            async for event in muapi_service.stream_chat_completion(
+            async for event in provider_service.stream_chat_completion(
                 model=selected_model,
                 messages=formatted_history,
                 system_prompt=system_prompt
