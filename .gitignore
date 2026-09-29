@@ -1,39 +1,32 @@
-# Dependencies
-node_modules/
-package-lock.json
-client/node_modules/
-client/package-lock.json
-
-# Next.js build output
-.next/
-client/.next/
-
-# Python / Server cache & environments
-__pycache__/
-*.pyc
-.venv/
-venv/
-env/
-server/__pycache__/
-server/app/__pycache__/
-server/app/routers/__pycache__/
-server/app/services/__pycache__/
-
-# Local data & environment secrets
+# Environment / secrets
 .env
-.env.local
-.env*.local
-*.log
-.open-dots/
-.open-grok-bot/
-*.sqlite3
-*.sqlite3-wal
-*.sqlite3-shm
-.encryption.key
-.auth-token
+.env.*
+!.env.example
+!.env.sample
+*.env
+secrets/
+*.pem
+*.key
+credentials.json
+service-account*.json
 
-# OS & Editor files
+# OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Logs / temp
+*.log
+tmp/
