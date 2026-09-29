@@ -1,0 +1,8 @@
+{
+  "name": "open-dots-computer-runtime",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "1.62.1"
+  }
+}
